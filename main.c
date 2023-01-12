@@ -1,11 +1,6 @@
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
-
-void statusTel(char what[]) {
-	printf(what, "\n");
-}
-
 unsigned int wiperSpeedStat(float STAT);
 
 
@@ -17,6 +12,7 @@ int main(void)
 	unsigned char wiperautoSW = 0;
 	float sensorstatus = 0;
 	unsigned int keystatus = 0xff; // 0xff: invalid, 0x01: idle, 0x02: ACC, 0x03: RUN, 0x04: START
+	
 	float dutycyvle = 0;
 	unsigned char BCMwiperstatus = 0x02; // 0xff: invalid, 0x01:active, 0x02: not active
 
@@ -26,9 +22,9 @@ int main(void)
 	unsigned char Slowmode = 0;
 	unsigned char Fastmode = 0;
 	unsigned int Sensorres = 0;
-	while (1) 
+	while (1) //while loop (this runs until the chip turns off)
 	{
-		if (kbhit())
+		if (kbhit())//chesks for input
 		{
 			unsigned char c = _getch();
 			if (c == '1')
@@ -36,25 +32,19 @@ int main(void)
 				switch (keystatus)
 				{
 					case 0xff:
-						//statusTel("invalid");
 					case 0x04:
-						//statusTel("switched status : IDLE");
 						keystatus = 0x01;
 						break;
 					case 0x01:
-						//statusTel("switched status : ACC");
 						keystatus = 0x02;
 						break;
 					case 0x02:
-						//statusTel("switched status : RUN");
 						keystatus = 0x03;
 						break;
 					case 0x03:
-					//	statusTel("switched status : START");
 						keystatus = 0x04;
 						break;
 					default:
-						//statusTel("well nothing");
 						break;
 				}
 
@@ -110,7 +100,7 @@ int main(void)
 				}
 			}
 			else if(c == '5')//rain mode
-			{
+			{//this simulates sensor output (should be replaced)
 				sensorstatus = sensorstatus + 1;
 				if (sensorstatus > 5)
 				{
@@ -137,34 +127,33 @@ int main(void)
 			}
 			if(Automode)
 			{
-				//printf(wiperSpeedStat(sensorstatus));
 				switch(wiperSpeedStat(sensorstatus))
 				{
 					case 2:
-						//printf("off");
+						//OFF
 						Slowmode = 0;
 						Fastmode = 0;
 						break;
 					case 3:
-						//printf("slow");
+						//SLOW
 						Slowmode = 1;
 						Fastmode = 0;
 						break;
 					case 4:
-						//printf("Fast");
+						//FAST
 						Slowmode = 0;
 						Fastmode = 1;
 						break;
 					case 1:
-						//printf("invalid");
+						//sensor failure (fail safe defaulted to fast)
 						Fastmode = 1;
 						Slowmode = 0;
 						break;
 					default:
-						//statusTel("data error");
 						break;
 				}
 			}
+			//some text for debugging porpues
 			printf("keystatus: %d " "ignition: %d " "Automode: %d " "Slowmode: %d " "Fastmode: %d " "sensorOutput: %f\n",
 			keystatus,
 			IgnitionSW,
@@ -179,7 +168,7 @@ int main(void)
 }
 
 
-unsigned int wiperSpeedStat(float STAT)
+unsigned int wiperSpeedStat(float STAT)//sensor value selection
 {
 	if (STAT >= 1.0f && STAT <= 2.0f)
 	{
