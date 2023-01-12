@@ -6,22 +6,7 @@ void statusTel(char what[]) {
 	printf(what, "\n");
 }
 
-unsigned int wiperSpeedStat(float STAT)
-{
-	if (STAT > 1.0f && STAT < 2.0f)
-	{
-		return 2;
-	}
-	else if (STAT > 2.0f && STAT < 3.0f)
-	{
-		return 3;
-	}
-	else if (STAT > 3.0f && STAT < 4.0f)
-	{
-		return 4;
-	}
-	return 1;
-}
+unsigned int wiperSpeedStat(float STAT);
 
 
 int main(void)
@@ -124,7 +109,7 @@ int main(void)
 					}
 				}
 			}
-			else if(c == '5')//Fast switch selection
+			else if(c == '5')//rain mode
 			{
 				sensorstatus = sensorstatus + 1;
 				if (sensorstatus > 5)
@@ -156,40 +141,57 @@ int main(void)
 				switch(wiperSpeedStat(sensorstatus))
 				{
 					case 2:
-						printf("off");
+						//printf("off");
 						Slowmode = 0;
 						Fastmode = 0;
 						break;
 					case 3:
-						printf("slow");
+						//printf("slow");
 						Slowmode = 1;
 						Fastmode = 0;
 						break;
 					case 4:
-						printf("Fast");
+						//printf("Fast");
 						Slowmode = 0;
 						Fastmode = 1;
 						break;
 					case 1:
-						printf("invalid");
+						//printf("invalid");
 						Fastmode = 1;
 						Slowmode = 0;
 						break;
 					default:
-						statusTel("data error");
+						//statusTel("data error");
 						break;
 				}
 			}
-			printf("keystatus: %d " "ignition: %d " "Automode: %d " "Fastmode: %d " "Slowmode: %d " "sensorOutput: %f\n",
+			printf("keystatus: %d " "ignition: %d " "Automode: %d " "Slowmode: %d " "Fastmode: %d " "sensorOutput: %f\n",
 			keystatus,
 			IgnitionSW,
 			Automode,
-			Fastmode,
 			Slowmode,
+			Fastmode,
 			sensorstatus);
-			
 			
 		}
 	}
 	return 0;
+}
+
+
+unsigned int wiperSpeedStat(float STAT)
+{
+	if (STAT >= 1.0f && STAT <= 2.0f)
+	{
+		return 2;
+	}
+	else if (STAT > 2.0f && STAT <= 3.0f)
+	{
+		return 3;
+	}
+	else if (STAT > 3.0f && STAT <= 4.0f)
+	{
+		return 4;
+	}
+	return 1;
 }
