@@ -2,11 +2,11 @@
 #include <conio.h>
 #include <string.h>
 
-unsigned int wiperSpeedStat(float STAT); // for implementing sensor valeue
+unsigned int wiperSpeedStat(float sensorstatus); // for implementing sensor valeue
 
 unsigned int dutysetter(unsigned char Fast, unsigned char slow); // duty cycle operating
 
-unsigned char BCMsetter(float STAT, unsigned char switched, unsigned char autoed);  //BCM_wiperstatus operating
+unsigned char BCMsetter(float sensorstatus, unsigned char switched, unsigned char autoed);  //BCM_wiperstatus operating
 
 int main(void)
 {
@@ -18,13 +18,14 @@ int main(void)
 	unsigned int keystatus = 0xff; // 0xff: invalid, 0x01: idle, 0x02: ACC, 0x03: RUN, 0x04: START
 	unsigned int dutycyvle = 0;
 	unsigned char BCMwiperstatus_stat[] = "not active";
-
+        unsigned char BCMwiperstatus = 0x02; // 0xff: invalid, 0x01:active, 0x02: not active
+	
 	// internal signals
 	unsigned char IgnitionSW = 0;
 	unsigned char Automode = 0;
 	unsigned char Slowmode = 0;
 	unsigned char Fastmode = 0;
-	unsigned char BCMwiperstatus = 0x02; // 0xff: invalid, 0x01:active, 0x02: not active
+	
 	
 	while (1) //while loop (this runs until the chip turns off)
 	{
@@ -190,17 +191,17 @@ int main(void)
 	return 0;
 }
 
-unsigned int wiperSpeedStat(float STAT)//sensor value selection
+unsigned int wiperSpeedStat(float sensorstatus)//sensor value selection
 {
-	if (STAT >= 1.0f && STAT <= 2.0f)
+	if (sensorstatus >= 1.0f && sensorstatus <= 2.0f)
 	{
 		return 2;
 	}
-	else if (STAT > 2.0f && STAT <= 3.0f)
+	else if (sensorstatus > 2.0f && sensorstatus <= 3.0f)
 	{
 		return 3;
 	}
-	else if (STAT > 3.0f && STAT <= 4.0f)
+	else if (sensorstatus > 3.0f && sensorstatus <= 4.0f)
 	{
 		return 4;
 	}
@@ -221,7 +222,7 @@ unsigned int dutysetter(unsigned char Fast, unsigned char slow)//duty value sett
 }
 
 
-unsigned char BCMsetter(float STAT, unsigned char switched, unsigned char autoed)//BCM checker
+unsigned char BCMsetter(float sensorstatus, unsigned char switched, unsigned char autoed)//BCM checker
 {
 	if(switched)
 	{
@@ -229,7 +230,7 @@ unsigned char BCMsetter(float STAT, unsigned char switched, unsigned char autoed
 	}
 	if(autoed)
 	{
-		if(wiperSpeedStat(STAT) == 1)
+		if(wiperSpeedStat(sensorstatus) == 1)
 		{
 			return 0xff;
 		}
