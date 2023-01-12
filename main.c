@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
+
 unsigned int wiperSpeedStat(float STAT);
 
+unsigned int dutysetter(unsigned char Fast, unsigned char slow);
+
+unsigned char BCMsetter(float STAT, unsigned char switched, unsigned char autoed);
 
 int main(void)
 {
@@ -12,16 +16,16 @@ int main(void)
 	unsigned char wiperautoSW = 0;
 	float sensorstatus = 0;
 	unsigned int keystatus = 0xff; // 0xff: invalid, 0x01: idle, 0x02: ACC, 0x03: RUN, 0x04: START
-	
-	float dutycyvle = 0;
+	unsigned int dutycyvle = 0;
 	unsigned char BCMwiperstatus = 0x02; // 0xff: invalid, 0x01:active, 0x02: not active
+	unsigned char BCMwiperstatus_stat[] = "not active";
 
 	// internal signals
 	unsigned char IgnitionSW = 0;
 	unsigned char Automode = 0;
 	unsigned char Slowmode = 0;
 	unsigned char Fastmode = 0;
-	unsigned int Sensorres = 0;
+	
 	while (1) //while loop (this runs until the chip turns off)
 	{
 		if (kbhit())//chesks for input
@@ -153,20 +157,38 @@ int main(void)
 						break;
 				}
 			}
+			dutycyvle = dutysetter(Fastmode, Slowmode);
+			BCMwiperstatus = BCMsetter(sensorstatus, (wiperfastSW || wiperslowSW), wiperautoSW);
+			if (BCMwiperstatus == 0x01)//BCM value to massage
+			{
+				strcpy(BCMwiperstatus_stat, "active");
+			}
+			else if(BCMwiperstatus == 0x02)
+			{
+				//BCMwiperstatus_stat[] = "not active";
+				strcpy(BCMwiperstatus_stat, "not active");
+			}
+			else
+			{
+				//BCMwiperstatus_stat[] = "invalid";
+				strcpy(BCMwiperstatus_stat, "invalid");
+			}
 			//some text for debugging porpues
-			printf("keystatus: %d " "ignition: %d " "Automode: %d " "Slowmode: %d " "Fastmode: %d " "sensorOutput: %f\n",
+			printf("keystatus: %d " "ignition: %d " "Automode: %d " "Slowmode: %d " "Fastmode: %d " "sensorOutput: %.2f ""dutycycle: %i%c ""BCMState: %d : %5s\n",
 			keystatus,
 			IgnitionSW,
 			Automode,
 			Slowmode,
 			Fastmode,
-			sensorstatus);
-			
+			sensorstatus,
+			dutycyvle,
+			37,
+			BCMwiperstatus,
+			BCMwiperstatus_stat);
 		}
 	}
 	return 0;
 }
-
 
 unsigned int wiperSpeedStat(float STAT)//sensor value selection
 {
@@ -183,4 +205,35 @@ unsigned int wiperSpeedStat(float STAT)//sensor value selection
 		return 4;
 	}
 	return 1;
+}
+
+unsigned int dutysetter(unsigned char Fast, unsigned char slow)//duty value setter
+{
+	if (Fast)
+	{
+		return 85;
+	}
+	if (slow)
+	{
+		return 35;
+	}
+	return 0;
+}
+
+
+unsigned char BCMsetter(float STAT, unsigned char switched, unsigned char autoed)//BCM checker
+{
+	if(switched)
+	{
+		return 0x01;
+	}
+	if(autoed)
+	{
+		if(wiperSpeedStat(STAT) == 1)
+		{
+			return 0xff;
+		}
+		return 0x01;
+	}
+	return 0x02;
 }
