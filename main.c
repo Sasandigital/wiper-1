@@ -2,11 +2,11 @@
 #include <conio.h>
 #include <string.h>
 
-unsigned int wiperSpeedStat(float STAT);
+unsigned int wiperSpeedStat(float STAT); // for implementing sensor valeue
 
-unsigned int dutysetter(unsigned char Fast, unsigned char slow);
+unsigned int dutysetter(unsigned char Fast, unsigned char slow); // duty cycle operating
 
-unsigned char BCMsetter(float STAT, unsigned char switched, unsigned char autoed);
+unsigned char BCMsetter(float STAT, unsigned char switched, unsigned char autoed);  //BCM_wiperstatus operating
 
 int main(void)
 {
@@ -17,7 +17,6 @@ int main(void)
 	float sensorstatus = 0;
 	unsigned int keystatus = 0xff; // 0xff: invalid, 0x01: idle, 0x02: ACC, 0x03: RUN, 0x04: START
 	unsigned int dutycyvle = 0;
-	unsigned char BCMwiperstatus = 0x02; // 0xff: invalid, 0x01:active, 0x02: not active
 	unsigned char BCMwiperstatus_stat[] = "not active";
 
 	// internal signals
@@ -25,6 +24,7 @@ int main(void)
 	unsigned char Automode = 0;
 	unsigned char Slowmode = 0;
 	unsigned char Fastmode = 0;
+	unsigned char BCMwiperstatus = 0x02; // 0xff: invalid, 0x01:active, 0x02: not active
 	
 	while (1) //while loop (this runs until the chip turns off)
 	{
